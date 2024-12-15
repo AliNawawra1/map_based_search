@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:map_based_search_task/core/constants/asset_paths.dart';
 import 'package:map_based_search_task/core/utils/asset_loader.dart';
-import 'package:map_based_search_task/domain/entities/location.dart';
-import 'package:map_based_search_task/domain/entities/location_data.dart';
-import 'package:map_based_search_task/domain/interfaces/location_repository_interface.dart';
+import 'package:map_based_search_task/features/map_search/models/location.dart';
+import 'package:map_based_search_task/features/map_search/models/location_data.dart';
+import 'package:map_based_search_task/features/map_search/repositories/location_repository_interface.dart';
 
-class LocationRepository implements LocationRepositoryInterface {
+class LocationRepositoryImpl implements LocationRepositoryInterface {
   @override
   Future<List<Location>> fetchLocations(String searchTerm) async {
     try {
@@ -15,7 +15,7 @@ class LocationRepository implements LocationRepositoryInterface {
       /// Filter locations based on the search term
       final filteredLocations = _filterLocations(mockLocations, searchTerm);
 
-      /// Convert filtered locations to entities
+      /// Convert filtered locations to models
       return LocationData.from(filteredLocations).data;
     } catch (e) {
       debugPrint("Error fetching data: $e");
@@ -23,7 +23,6 @@ class LocationRepository implements LocationRepositoryInterface {
     }
   }
 
-  /// Filters locations based on the search term
   List<dynamic> _filterLocations(List<dynamic> locations, String searchTerm) {
     return locations.where((loc) {
       return loc["name"]!

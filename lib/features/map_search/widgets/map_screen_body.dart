@@ -4,7 +4,7 @@ import 'package:map_based_search_task/core/shared_widgets/offline_banner_widget.
 import 'package:map_based_search_task/core/shared_widgets/space_widget.dart';
 import 'package:map_based_search_task/features/map_search/controllers/map_search_controller.dart';
 import 'package:map_based_search_task/features/map_search/widgets/map_search_box.dart';
-import 'package:map_based_search_task/features/map_search/widgets/map_view.dart';
+import 'package:map_based_search_task/features/map_search/widgets/map_widget.dart';
 
 class MapScreenBody extends StatelessWidget {
   final MapSearchController controller;
@@ -21,7 +21,7 @@ class MapScreenBody extends StatelessWidget {
         Obx(
           () => GoogleMapView(
             markers: controller.markers.toSet(),
-            mapStyle: mapStyle,
+            mapStyle: controller.mapStyle.value,
             onMapCreated: controller.setMapController,
           ),
         ),
@@ -32,14 +32,12 @@ class MapScreenBody extends StatelessWidget {
   }
 
   Widget get _buildSearchBox => Positioned(
-        top: 50.0,
-        left: lrPadding,
-        right: lrPadding,
-        child: MapSearchBox(
+      top: 50.0,
+      left: lrPadding,
+      right: lrPadding,
+      child: MapSearchBox(
           searchController: controller.searchController,
-          onChanged: controller.onChanged,
-        ),
-      );
+          onChanged: controller.onChanged));
 
   Widget get _buildOfflineBanner => Positioned(
         bottom: 10.0,

@@ -10,9 +10,8 @@ class OfflineBannerWidget extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       margin: const EdgeInsets.symmetric(horizontal: 40.0),
       decoration: BoxDecoration(
-        color: Colors.red.withValues(alpha: 0.8),
-        borderRadius: BorderRadius.circular(8.0),
-      ),
+          color: Colors.red.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(8.0)),
       child: const CustomTextWidget(
         dataKey: "You're offline. Showing cached data.",
         fontColor: Colors.white,

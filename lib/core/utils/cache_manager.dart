@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
-import 'package:map_based_search_task/core/constants/asset_paths.dart';
 import 'package:path_provider/path_provider.dart';
 
 class CacheManager {
@@ -10,20 +8,6 @@ class CacheManager {
   static Future<String> getCacheFilePath() async {
     final directory = await getApplicationDocumentsDirectory();
     return '${directory.path}/cache.json';
-  }
-
-  /// Ensure `cache.json` is copied to the writable directory
-  static Future<void> ensureCacheFileExists() async {
-    final filePath = await getCacheFilePath();
-    final file = File(filePath);
-
-    if (!await file.exists()) {
-      final String content = await rootBundle.loadString(AssetPaths.cacheJson);
-      await file.writeAsString(content);
-      debugPrint("Copied `cache.json` to writable directory: $filePath");
-    } else {
-      debugPrint("`cache.json` already exists in the writable directory.");
-    }
   }
 
   /// Save data to the writable copy of `cache.json`

@@ -1,5 +1,5 @@
 import 'package:map_based_search_task/core/utils/json_utils.dart';
-import 'package:map_based_search_task/domain/entities/location.dart';
+import 'package:map_based_search_task/features/map_search/models/location.dart';
 
 class LocationData {
   List<Location> data;
