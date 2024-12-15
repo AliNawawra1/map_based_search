@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Electronic Store A",
+    "lat": 37.427961,
+    "lng": -122.085749
+  },
+  {
+    "name": "Electronic Store B",
+    "lat": 37.430045,
+    "lng": -122.092215
+  },
+  {
+    "name": "Electronic Hub C",
+    "lat": 37.429400,
+    "lng": -122.086500
+  },
+  {
+    "name": "Electronics & Gadgets D",
+    "lat": 37.431000,
+    "lng": -122.088000
+  },
+  {
+    "name": "Coffee Shop X",
+    "lat": 37.431622,
+    "lng": -122.085758
+  },
+  {
+    "name": "Cafe Latte Y",
+    "lat": 37.432500,
+    "lng": -122.087200
+  },
+  {
+    "name": "Espresso Bar Z",
+    "lat": 37.430800,
+    "lng": -122.085000
+  },
+  {
+    "name": "Coffee Corner A",
+    "lat": 37.428900,
+    "lng": -122.084900
+  },
+  {
+    "name": "Book Store Y",
+    "lat": 37.428321,
+    "lng": -122.084247
+  },
+  {
+    "name": "Book Store Z",
+    "lat": 19.0759837,
+    "lng": 72.8776559
+  }
+]
