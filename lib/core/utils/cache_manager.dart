@@ -11,7 +11,7 @@ class CacheManager {
   }
 
   /// Save data to the writable copy of `cache.json`
-  static Future<void> saveToCache(List<dynamic> data) async {
+  static Future<void> saveToCache(List<dynamic> newData) async {
     try {
       final filePath = await getCacheFilePath();
       final file = File(filePath);
@@ -22,8 +22,14 @@ class CacheManager {
         cacheData = jsonDecode(content);
       }
 
-      cacheData = data;
+      /// Remove duplicates: Keep only unique items
+      final existingIds = cacheData.map((item) => item["name"]).toSet();
+      final filteredNewData =
+          newData.where((item) => !existingIds.contains(item["name"])).toList();
 
+      cacheData.addAll(filteredNewData);
+
+      /// Save the updated cache
       await file.writeAsString(jsonEncode(cacheData));
       debugPrint("Data saved to cache: $filePath");
     } catch (e) {

@@ -10,8 +10,8 @@ class GoogleMapView extends StatelessWidget {
       {super.key, required this.markers, this.mapStyle, this.onMapCreated});
 
   static final CameraPosition _kGoogle = const CameraPosition(
-    target: LatLng(19.0759837, 72.8776559),
-    zoom: 15,
+    target: LatLng(37.42796133580664, -122.085749655962),
+    zoom: 14,
   );
 
   @override

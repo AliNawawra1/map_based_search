@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:map_based_search_task/core/constants/asset_paths.dart';
 import 'package:map_based_search_task/core/controllers/connectivity_controller.dart';
 import 'package:map_based_search_task/core/utils/cache_manager.dart';
+import 'package:map_based_search_task/core/utils/location_utils.dart';
 import 'package:map_based_search_task/core/utils/navigation_services.dart';
 import 'package:map_based_search_task/features/map_search/models/location.dart';
 import 'package:map_based_search_task/features/map_search/models/location_data.dart';
@@ -47,11 +48,6 @@ class MapSearchController extends GetxController {
     isLoading.value = true;
 
     try {
-      if (connectivityController.isOffline.value) {
-        NavigationServices.showInfoSnackBar(
-            "Offline Mode: Using cached data if available.");
-      }
-
       final locations = await _fetchLocations(searchTerm);
 
       connectivityController.isOffline.listen((offline) {
@@ -65,8 +61,6 @@ class MapSearchController extends GetxController {
         _updateMarkers(locations);
       } else {
         _clearMarkers();
-        NavigationServices.showInfoSnackBar(
-            "No locations found for \"$searchTerm\".");
       }
     } catch (e) {
       NavigationServices.showErrorSnackBar(
@@ -80,8 +74,12 @@ class MapSearchController extends GetxController {
   /// Returns a list of `Location` objects based on the search term.
   Future<List<Location>> _fetchLocations(String searchTerm) async {
     if (connectivityController.isOffline.isTrue) {
-      return LocationData.from(await CacheManager.readFromCache() ?? []).data;
+      final cachedData = await CacheManager.readFromCache() ?? [];
+      final filteredData =
+          LocationUtils.filterLocations(cachedData, searchTerm);
+      return LocationData.from(filteredData).data;
     }
+
     return locationRepository.fetchLocations(searchTerm);
   }
 
