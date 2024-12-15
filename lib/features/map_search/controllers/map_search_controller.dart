@@ -75,6 +75,12 @@ class MapSearchController extends GetxController {
   Future<List<Location>> _fetchLocations(String searchTerm) async {
     if (connectivityController.isOffline.isTrue) {
       final cachedData = await CacheManager.readFromCache() ?? [];
+      if (cachedData.isEmpty) {
+        NavigationServices.showInfoSnackBar(
+            "No cached data available. Please connect to the internet to load locations.");
+        return [];
+      }
+
       final filteredData =
           LocationUtils.filterLocations(cachedData, searchTerm);
       return LocationData.from(filteredData).data;
