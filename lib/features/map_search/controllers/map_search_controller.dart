@@ -21,7 +21,6 @@ class MapSearchController extends GetxController {
 
   RxBool isLoading = false.obs;
   RxList<Marker> markers = RxList<Marker>();
-  Timer? _timer;
   Rxn<String> mapStyle = Rxn<String>();
 
   MapSearchController() : locationRepository = LocationRepositoryImpl();
@@ -129,21 +128,16 @@ class MapSearchController extends GetxController {
     return LatLngBounds(southwest: latLngBounds, northeast: latLngBounds);
   }
 
-  /// Called when the user changes the search term in the input field.
-  /// - Clears markers if the input is empty.
-  /// - Initiates a search otherwise.
-  void onChanged(String value) async {
-    if (value.isEmpty) {
-      markers.clear();
+  Future<void> onSubmit() async {
+    final searchTerm = searchController.text.trim();
+
+    if (searchTerm.isEmpty) {
+      _clearMarkers();
       (await mapController.future).animateCamera(CameraUpdate.zoomOut());
       return;
     }
 
-    _timer?.cancel();
-    _timer = Timer(
-      Duration(milliseconds: 800),
-      () => searchLocations(value),
-    );
+    await searchLocations(searchTerm);
   }
 
   /// Set the map controller when the map is created

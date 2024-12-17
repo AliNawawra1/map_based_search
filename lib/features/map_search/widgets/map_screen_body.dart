@@ -36,8 +36,9 @@ class MapScreenBody extends StatelessWidget {
       left: lrPadding,
       right: lrPadding,
       child: MapSearchBox(
-          searchController: controller.searchController,
-          onChanged: controller.onChanged));
+        searchController: controller.searchController,
+        onSubmit: controller.onSubmit,
+      ));
 
   Widget get _buildOfflineBanner => Positioned(
         bottom: 10.0,

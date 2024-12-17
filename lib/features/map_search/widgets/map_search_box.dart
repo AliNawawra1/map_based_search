@@ -4,14 +4,10 @@ import 'package:map_based_search_task/core/shared_widgets/space_widget.dart';
 
 class MapSearchBox extends StatelessWidget {
   final TextEditingController searchController;
-  final ValueChanged<String>? onSubmitted;
-  final ValueChanged<String>? onChanged;
+  final VoidCallback? onSubmit;
 
   const MapSearchBox(
-      {super.key,
-      required this.searchController,
-      this.onSubmitted,
-      this.onChanged});
+      {super.key, required this.searchController, this.onSubmit});
 
   @override
   Widget build(BuildContext context) => Container(
@@ -35,8 +31,6 @@ class MapSearchBox extends StatelessWidget {
               child: TextField(
                 onTapOutside: (_) => FocusScope.of(context).unfocus(),
                 controller: searchController,
-                onSubmitted: onSubmitted,
-                onChanged: onChanged,
                 decoration: const InputDecoration(
                   hintText: "What are you looking for, Layan?",
                   contentPadding: EdgeInsets.only(bottom: 8.0),
@@ -45,7 +39,9 @@ class MapSearchBox extends StatelessWidget {
                 ),
               ),
             ),
-            Icon(Icons.map, color: Palette.grey),
+            IconButton(
+                onPressed: onSubmit,
+                icon: Icon(Icons.map, color: Palette.grey)),
           ],
         ),
       );
