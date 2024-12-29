@@ -1,28 +1,86 @@
 import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
 import 'package:map_based_search_task/core/constants/api_paths.dart';
+import 'package:map_based_search_task/core/controllers/connectivity_controller.dart';
 import 'package:map_based_search_task/core/services/api_service.dart';
 import 'package:map_based_search_task/core/utils/bloom_filter.dart';
 import 'package:map_based_search_task/core/utils/lru_cache.dart';
 import 'package:map_based_search_task/features/map_search/models/location.dart';
-import 'package:map_based_search_task/features/map_search/repositories/map_location_repository_interface.dart';
+import 'package:map_based_search_task/features/map_search/repositories/location_repository_interface.dart';
 
-class LocationRepository implements LocationRepositoryInterface {
+class LocationRepositoryImpl implements LocationRepositoryInterface {
   final _apiService = APIService();
-  final LRUCache<String, List<Location>> _lruCache = LRUCache(10);
-  final _bloomFilter = BloomFilter(size: 1000, hashFunctions: 3);
+  final connectivityController = Get.find<ConnectivityController>();
+  final falsePositiveRate = 0.01;
+  late LRUCache<String, List<Location>> _cache;
+  late BloomFilter _filter;
+  bool _needsRetry = false;
+  int expectedNumItems = 100;
+
+  LocationRepositoryImpl() {
+    _cache = LRUCache(expectedNumItems: expectedNumItems);
+    _filter = BloomFilter(expectedNumItems: expectedNumItems);
+    _initializeCaches();
+    _listenToConnectivityChanges();
+  }
+
+  bool get cacheIsEmpty => _cache.isEmpty;
+
+  /// Initialize caches
+  Future<void> _initializeCaches() async {
+    try {
+      expectedNumItems = await _fetchLocationCount();
+
+      if (expectedNumItems == 0) {
+        expectedNumItems = 100;
+        _needsRetry = true;
+        return;
+      }
+
+      _cache = LRUCache(expectedNumItems: expectedNumItems);
+      _filter = BloomFilter(expectedNumItems: expectedNumItems);
+
+      _needsRetry = false;
+      debugPrint(
+          'Initialized BloomFilter and LRUCache with $expectedNumItems items.');
+    } catch (e) {
+      debugPrint('Error initializing caches: $e. Using default values.');
+    }
+  }
+
+  /// Retry initialization when connection is restored
+  void _listenToConnectivityChanges() {
+    connectivityController.isOffline.listen((isOffline) async {
+      if (!isOffline && _needsRetry) {
+        debugPrint('Connection restored. Retrying cache initialization.');
+        await _initializeCaches();
+      }
+    });
+  }
+
+  Future<int> _fetchLocationCount() async {
+    try {
+      final response = await _apiService.getRequest(APIPaths.locationsCount);
+
+      if (response is Map<String, dynamic> &&
+          response.containsKey(APIPaths.totalLocations)) {
+        return response[APIPaths.totalLocations] as int;
+      }
+
+      return 0;
+    } catch (e) {
+      debugPrint('Error fetching location count: $e');
+      return 0;
+    }
+  }
 
   @override
   Future<List<Location>> searchLocations(String searchTerm) async {
-    /// Use Bloom Filter to check if the term might exist
-    if (_bloomFilter.contains(searchTerm)) {
-      debugPrint("Search term possibly exists, checking cache...");
-      if (_lruCache.containsKey(searchTerm)) {
-        return _lruCache.get(searchTerm)!;
+    /// Check Bloom Filter
+    if (_filter.contains(searchTerm)) {
+      if (_cache.containsKey(searchTerm)) {
+        return _cache.get(searchTerm)!;
       }
-    } else {
-      debugPrint(
-          "Search term definitely does not exist, adding to Bloom Filter.");
-      _bloomFilter.add(searchTerm);
     }
 
     /// Fetch from API as fallback
@@ -31,7 +89,11 @@ class LocationRepository implements LocationRepositoryInterface {
           .getRequest('${APIPaths.searchLocations}?item=$searchTerm');
       final results = _parseLocationResponse(response);
 
-      _lruCache.set(searchTerm, results);
+      if (results.isNotEmpty) {
+        _filter.add(searchTerm);
+        _cache.set(searchTerm, results);
+      }
+
       return results;
     } catch (e) {
       debugPrint("Error searching data: $e");

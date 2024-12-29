@@ -1,24 +1,23 @@
 class Location {
   final String name;
-  final double latitude;
-  final double longitude;
+  final double lat;
+  final double lng;
 
-  const Location(
-      {required this.name, required this.latitude, required this.longitude});
+  const Location({required this.name, required this.lat, required this.lng});
 
-  factory Location.fromMap(Map<String, dynamic> map) {
+  factory Location.fromJson(Map<String, dynamic> map) {
     return Location(
       name: map['name'] as String,
-      latitude: map['lat'] as double,
-      longitude: map['lng'] as double,
+      lat: map['lat'] as double,
+      lng: map['lng'] as double,
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'lat': latitude,
-      'lng': longitude,
+      'lat': lat,
+      'lng': lng,
     };
   }
 }

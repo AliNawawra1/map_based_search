@@ -1,7 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:map_based_search_task/core/utils/navigation_services.dart';
+import 'package:map_based_search_task/core/services/navigation_services.dart';
 
 class ConnectivityController extends GetxController {
   RxBool isOffline = false.obs;
